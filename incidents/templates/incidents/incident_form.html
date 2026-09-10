@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit incident{% else %}New incident{% endif %}{% endblock %}
+
+{% block content %}
+    <h1>{% if object %}Edit incident{% else %}New incident{% endif %}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="actions">
+            <button type="submit">Save</button>
+            {% if object %}
+                <a href="{% url 'incidents:detail' object.pk %}">Cancel</a>
+            {% else %}
+                <a href="{% url 'incidents:list' %}">Cancel</a>
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

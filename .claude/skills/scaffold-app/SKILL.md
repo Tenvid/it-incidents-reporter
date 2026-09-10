@@ -1,10 +1,10 @@
 ---
 name: scaffold-app
-description: Add one of it-incidents-reporter's still-pending apps/modules (incidencias, ml, networking, analisis) consistent with the project's conventions, when asked to create a new app or module in this repo.
+description: Add one of it-incidents-reporter's still-pending apps/modules (ml, networking, analisis) consistent with the project's conventions, when asked to create a new app or module in this repo.
 ---
 
 it-incidents-reporter is a monolithic Django app. Per
-`.claude/rules/structure.md`, only `incidencias`, `ml`, `networking`,
+`.claude/rules/structure.md`, only `ml`, `networking`,
 `analisis`, `tests`, `informe` and `presentacion` are still pending. When
 asked to create one of them:
 

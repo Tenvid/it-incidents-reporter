@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}{{ incident.title }}{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>{{ incident.title }}</h1>
+    </div>
+
+    <dl class="detail">
+        <dt>Description</dt>
+        <dd>{{ incident.description }}</dd>
+        <dt>Equipment</dt>
+        <dd>{{ incident.equipment }}</dd>
+        <dt>Priority</dt>
+        <dd>{{ incident.get_priority_display }}</dd>
+        <dt>Status</dt>
+        <dd>{{ incident.get_status_display }}</dd>
+        <dt>Reported by</dt>
+        <dd>{{ incident.user }}</dd>
+        <dt>Date</dt>
+        <dd>{{ incident.date|date:"Y-m-d H:i" }}</dd>
+    </dl>
+
+    <div class="actions">
+        <a class="button" href="{% url 'incidents:update' incident.pk %}">Edit</a>
+        <a class="button danger" href="{% url 'incidents:delete' incident.pk %}">Delete</a>
+        <a href="{% url 'incidents:list' %}">Back to list</a>
+    </div>
+{% endblock %}
