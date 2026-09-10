@@ -14,6 +14,8 @@ it-incidents-reporter/
 ├── analisis/
 │   └── analisis.ipynb          # análisis exploratorio con Pandas
 ├── tests/                     # tests con pytest
+│   ├── unit/                   # tests unitarios (sin BD real o BD trivial)
+│   └── integration/            # tests de integración (vistas, flujos CRUD)
 ├── informe/                   # informe técnico final (PDF)
 └── presentacion/               # presentación final (PPTX)
 ```
@@ -21,10 +23,14 @@ it-incidents-reporter/
 ## Estado de implementación
 
 - **Ya implementado**: `manage.py`, `incidents_reporter/` (proyecto Django
-  base) y `user/` (modelo de usuario propio, registrado como
-  `AUTH_USER_MODEL`).
-- **Pendiente**: `incidencias/`, `networking/`, `ml/`, `analisis/`,
-  `tests/`, `informe/`, `presentacion/` — ninguno existe todavía en el
-  repositorio. El árbol de arriba describe la estructura objetivo del
-  proyecto, no el estado actual del código. Al crear cada uno, seguir
-  [`conventions.md`](conventions.md).
+  base), `user/` (modelo de usuario propio, registrado como
+  `AUTH_USER_MODEL`) e `incidents/` (CRUD de incidencias y filtrado por
+  estado/prioridad; el dashboard con gráficos queda pendiente dentro de
+  esta misma app). `tests/unit/` y `tests/integration/` existen como
+  esqueleto (configurado en `pyproject.toml` y ejecutable vía
+  `make test-unit` / `make test-integration` / `make test`), pero están
+  vacíos — los ficheros de test de cada app se añaden con la skill `tests`.
+- **Pendiente**: `networking/`, `ml/`, `analisis/`, `informe/`,
+  `presentacion/` — ninguno existe todavía en el repositorio. El árbol de
+  arriba describe la estructura objetivo del proyecto, no el estado actual
+  del código. Al crear cada uno, seguir [`conventions.md`](conventions.md).
