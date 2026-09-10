@@ -81,6 +81,11 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
+        # Integration tests must never touch db.sqlite3 — force pytest-django
+        # to build an in-memory database instead of the dev one.
+        "TEST": {
+            "NAME": ":memory:",
+        },
     }
 }
 

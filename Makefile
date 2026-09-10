@@ -1,4 +1,4 @@
-.PHONY: venv run migrate qa test
+.PHONY: venv run migrate qa test test-unit test-integration
 
 PATH_ARG ?= .
 
@@ -25,3 +25,11 @@ qa:
 # Ejecuta los tests (carpeta tests/ en la raíz del proyecto)
 test:
 	uv run pytest tests
+
+# Ejecuta solo los tests unitarios (tests/unit)
+test-unit:
+	uv run pytest tests/unit
+
+# Ejecuta solo los tests de integración (tests/integration)
+test-integration:
+	uv run pytest tests/integration
