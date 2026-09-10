@@ -2,7 +2,7 @@
 
 - Vistas de Django basadas en clases (salvo que por algún motivo sea necesario crear una vista basada en funciones.
   Estos motivos pueden ser por simplicidad de código o por limitaciones técnicas),
-  manteniendo el CRUD de incidencias en la app `incidencias`.
+  manteniendo el CRUD de incidencias en la app `incidents`.
 - La lógica de ML (entrenamiento) vive en notebooks; el modelo entrenado se
   serializa (p. ej. `joblib`) y se carga desde Django solo para inferencia,
   sin reentrenar en cada petición.

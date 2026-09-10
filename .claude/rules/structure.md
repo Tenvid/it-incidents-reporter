@@ -5,7 +5,7 @@ it-incidents-reporter/
 ├── manage.py
 ├── incidents_reporter/        # proyecto Django (settings, urls, wsgi/asgi)
 ├── user/                      # app Django: usuario propio (auth por email + DNI)
-├── incidencias/               # app Django: modelos, vistas, forms, CRUD, dashboard
+├── incidents/                  # app Django: modelos, vistas, forms, CRUD, dashboard
 ├── networking/
 │   └── comprobacion.py        # comprobación de conectividad (socket/requests)
 ├── ml/
