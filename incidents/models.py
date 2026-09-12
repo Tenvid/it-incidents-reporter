@@ -32,6 +32,7 @@ class Incident(models.Model):
     status = models.CharField(
         "status", max_length=11, choices=Status.choices, default=Status.OPEN
     )
+    is_archived = models.BooleanField("archived", default=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

@@ -42,8 +42,14 @@ def test_update_view_redirects_anonymous_user_to_login(client: Client, incident:
     assert response["Location"].startswith("/admin/login/")
 
 
-def test_delete_view_redirects_anonymous_user_to_login(client: Client, incident: Incident) -> None:
-    response = client.get(reverse("incidents:delete", kwargs={"pk": incident.pk}))
+def test_archive_view_redirects_anonymous_user_to_login(client: Client, incident: Incident) -> None:
+    response = client.get(reverse("incidents:archive", kwargs={"pk": incident.pk}))
+    assert response.status_code == 302
+    assert response["Location"].startswith("/admin/login/")
+
+
+def test_unarchive_view_redirects_anonymous_user_to_login(client: Client, archived_incident: Incident) -> None:
+    response = client.get(reverse("incidents:unarchive", kwargs={"pk": archived_incident.pk}))
     assert response.status_code == 302
     assert response["Location"].startswith("/admin/login/")
 
@@ -165,6 +171,56 @@ def test_list_view_context_includes_choice_lists(client: Client, user: CustomUse
     assert response.context["priority_choices"] == Incident.Priority.choices
 
 
+def test_list_view_excludes_archived_incidents_for_non_staff_user(
+    client: Client, user: CustomUser, incident: Incident, archived_incident: Incident
+) -> None:
+    client.force_login(user)
+    response = client.get(reverse("incidents:list"))
+    incidents = list(response.context["incidents"])
+    assert incident in incidents
+    assert archived_incident not in incidents
+
+
+def test_list_view_archived_query_param_is_ignored_for_non_staff_user(
+    client: Client, user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(user)
+    response = client.get(reverse("incidents:list"), {"archived": "all"})
+    assert archived_incident not in list(response.context["incidents"])
+    assert "archived_choices" not in response.context
+
+
+def test_list_view_defaults_to_not_archived_for_staff_user(
+    client: Client, staff_user: CustomUser, incident: Incident, archived_incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.get(reverse("incidents:list"))
+    incidents = list(response.context["incidents"])
+    assert incident in incidents
+    assert archived_incident not in incidents
+    assert response.context["selected_archived"] == "not_archived"
+
+
+def test_list_view_only_archived_filter_for_staff_user(
+    client: Client, staff_user: CustomUser, incident: Incident, archived_incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.get(reverse("incidents:list"), {"archived": "only_archived"})
+    incidents = list(response.context["incidents"])
+    assert archived_incident in incidents
+    assert incident not in incidents
+
+
+def test_list_view_all_filter_for_staff_user_includes_archived(
+    client: Client, staff_user: CustomUser, incident: Incident, archived_incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.get(reverse("incidents:list"), {"archived": "all"})
+    incidents = list(response.context["incidents"])
+    assert incident in incidents
+    assert archived_incident in incidents
+
+
 # --- Detail view ---
 
 
@@ -180,6 +236,23 @@ def test_detail_view_returns_404_for_nonexistent_pk(client: Client, user: Custom
     nonexistent_pk = incident.pk + 999
     response = client.get(reverse("incidents:detail", kwargs={"pk": nonexistent_pk}))
     assert response.status_code == 404
+
+
+def test_detail_view_returns_404_for_archived_incident_for_non_staff_user(
+    client: Client, user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(user)
+    response = client.get(reverse("incidents:detail", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 404
+
+
+def test_detail_view_returns_200_for_archived_incident_for_staff_user(
+    client: Client, staff_user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.get(reverse("incidents:detail", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 200
+    assert response.context["incident"] == archived_incident
 
 
 # --- Create view ---
@@ -253,28 +326,96 @@ def test_update_view_post_invalid_rerenders_form_with_errors(client: Client, use
     assert incident.title == original_title
 
 
-# --- Delete view ---
-
-
-def test_delete_view_get_renders_confirmation_page(client: Client, user: CustomUser, incident: Incident) -> None:
+def test_update_view_returns_404_for_archived_incident_for_non_staff_user(
+    client: Client, user: CustomUser, archived_incident: Incident
+) -> None:
     client.force_login(user)
-    response = client.get(reverse("incidents:delete", kwargs={"pk": incident.pk}))
+    response = client.get(reverse("incidents:update", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 404
+
+
+def test_update_view_returns_200_for_archived_incident_for_staff_user(
+    client: Client, staff_user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.get(reverse("incidents:update", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 200
+
+
+# --- Archive view ---
+
+
+def test_archive_view_get_renders_confirmation_page_for_staff_user(
+    client: Client, staff_user: CustomUser, incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.get(reverse("incidents:archive", kwargs={"pk": incident.pk}))
     assert response.status_code == 200
     assert response.context["incident"] == incident
 
 
-def test_delete_view_post_deletes_and_redirects_to_list(client: Client, user: CustomUser, incident: Incident) -> None:
-    client.force_login(user)
-    response = client.post(reverse("incidents:delete", kwargs={"pk": incident.pk}))
-    assert response.status_code == 302
-    assert response["Location"] == reverse("incidents:list")
-    assert not Incident.objects.filter(pk=incident.pk).exists()
-
-
-def test_delete_view_post_by_different_user_still_succeeds(
-    client: Client, other_user: CustomUser, incident: Incident
+def test_archive_view_post_archives_and_redirects_to_detail(
+    client: Client, staff_user: CustomUser, incident: Incident
 ) -> None:
-    client.force_login(other_user)
-    response = client.post(reverse("incidents:delete", kwargs={"pk": incident.pk}))
+    client.force_login(staff_user)
+    response = client.post(reverse("incidents:archive", kwargs={"pk": incident.pk}))
     assert response.status_code == 302
-    assert not Incident.objects.filter(pk=incident.pk).exists()
+    assert response["Location"] == incident.get_absolute_url()
+    incident.refresh_from_db()
+    assert incident.is_archived is True
+    assert Incident.objects.filter(pk=incident.pk).exists()
+
+
+def test_archive_view_get_forbidden_for_non_staff_user(client: Client, user: CustomUser, incident: Incident) -> None:
+    client.force_login(user)
+    response = client.get(reverse("incidents:archive", kwargs={"pk": incident.pk}))
+    assert response.status_code == 403
+
+
+def test_archive_view_post_forbidden_for_non_staff_user(client: Client, user: CustomUser, incident: Incident) -> None:
+    client.force_login(user)
+    response = client.post(reverse("incidents:archive", kwargs={"pk": incident.pk}))
+    assert response.status_code == 403
+    incident.refresh_from_db()
+    assert incident.is_archived is False
+
+
+# --- Unarchive view ---
+
+
+def test_unarchive_view_get_renders_confirmation_page_for_staff_user(
+    client: Client, staff_user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.get(reverse("incidents:unarchive", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 200
+    assert response.context["incident"] == archived_incident
+
+
+def test_unarchive_view_post_unarchives_and_redirects_to_detail(
+    client: Client, staff_user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(staff_user)
+    response = client.post(reverse("incidents:unarchive", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 302
+    assert response["Location"] == archived_incident.get_absolute_url()
+    archived_incident.refresh_from_db()
+    assert archived_incident.is_archived is False
+
+
+def test_unarchive_view_get_forbidden_for_non_staff_user(
+    client: Client, user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(user)
+    response = client.get(reverse("incidents:unarchive", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 403
+
+
+def test_unarchive_view_post_forbidden_for_non_staff_user(
+    client: Client, user: CustomUser, archived_incident: Incident
+) -> None:
+    client.force_login(user)
+    response = client.post(reverse("incidents:unarchive", kwargs={"pk": archived_incident.pk}))
+    assert response.status_code == 403
+    archived_incident.refresh_from_db()
+    assert archived_incident.is_archived is True

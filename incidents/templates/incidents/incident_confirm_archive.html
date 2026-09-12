@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Archive incident{% endblock %}
+
+{% block content %}
+    <h1>Archive incident</h1>
+    <p>Are you sure you want to archive “{{ incident.title }}”? It will no longer be visible to regular users, but administrators will still be able to see it.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="actions">
+            <button type="submit" class="danger">Archive</button>
+            <a href="{% url 'incidents:detail' incident.pk %}">Cancel</a>
+        </div>
+    </form>
+{% endblock %}

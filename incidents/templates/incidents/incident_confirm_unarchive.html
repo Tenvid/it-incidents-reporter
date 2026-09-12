@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Unarchive incident{% endblock %}
+
+{% block content %}
+    <h1>Unarchive incident</h1>
+    <p>Are you sure you want to unarchive “{{ incident.title }}”? It will become visible to regular users again.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="actions">
+            <button type="submit">Unarchive</button>
+            <a href="{% url 'incidents:detail' incident.pk %}">Cancel</a>
+        </div>
+    </form>
+{% endblock %}

@@ -11,5 +11,10 @@ urlpatterns = [
     path("new/", views.IncidentCreateView.as_view(), name="create"),
     path("<int:pk>/", views.IncidentDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", views.IncidentUpdateView.as_view(), name="update"),
-    path("<int:pk>/delete/", views.IncidentDeleteView.as_view(), name="delete"),
+    path("<int:pk>/archive/", views.IncidentArchiveView.as_view(), name="archive"),
+    path(
+        "<int:pk>/unarchive/",
+        views.IncidentUnarchiveView.as_view(),
+        name="unarchive",
+    ),
 ]

@@ -46,6 +46,17 @@ def test_date_is_set_automatically_on_create(incident: Incident) -> None:
 
 
 @pytest.mark.django_db
+def test_default_is_archived_is_false(user: CustomUser) -> None:
+    incident = Incident.objects.create(
+        title="Slow network",
+        description="Network is slower than usual.",
+        equipment="Router-01",
+        user=user,
+    )
+    assert incident.is_archived is False
+
+
+@pytest.mark.django_db
 def test_ordering_by_date_descending(user: CustomUser) -> None:
     first = Incident.objects.create(
         title="First incident",

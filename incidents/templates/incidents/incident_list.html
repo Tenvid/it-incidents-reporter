@@ -27,6 +27,16 @@
                 {% endfor %}
             </select>
         </label>
+        {% if request.user.is_staff %}
+            <label>
+                Archived
+                <select name="archived">
+                    {% for value, label in archived_choices %}
+                        <option value="{{ value }}" {% if value == selected_archived %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        {% endif %}
         <button type="submit">Filter</button>
     </form>
 
@@ -44,7 +54,7 @@
         <tbody>
             {% for incident in incidents %}
                 <tr>
-                    <td><a href="{% url 'incidents:detail' incident.pk %}">{{ incident.title }}</a></td>
+                    <td><a href="{% url 'incidents:detail' incident.pk %}">{{ incident.title }}</a>{% if incident.is_archived %} <small>(archived)</small>{% endif %}</td>
                     <td>{{ incident.equipment }}</td>
                     <td>{{ incident.get_priority_display }}</td>
                     <td>{{ incident.get_status_display }}</td>
@@ -62,11 +72,11 @@
     {% if is_paginated %}
         <div class="pagination">
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}">Previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}&{{ filter_querystring }}">Previous</a>
             {% endif %}
             <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}">Next</a>
+                <a href="?page={{ page_obj.next_page_number }}&{{ filter_querystring }}">Next</a>
             {% endif %}
         </div>
     {% endif %}

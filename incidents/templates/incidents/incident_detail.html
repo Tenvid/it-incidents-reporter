@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="page-header">
-        <h1>{{ incident.title }}</h1>
+        <h1>{{ incident.title }}{% if incident.is_archived %} <small>(archived)</small>{% endif %}</h1>
     </div>
 
     <dl class="detail">
@@ -24,7 +24,11 @@
 
     <div class="actions">
         <a class="button" href="{% url 'incidents:update' incident.pk %}">Edit</a>
-        <a class="button danger" href="{% url 'incidents:delete' incident.pk %}">Delete</a>
+        {% if request.user.is_staff and incident.is_archived %}
+            <a class="button" href="{% url 'incidents:unarchive' incident.pk %}">Unarchive</a>
+        {% elif request.user.is_staff %}
+            <a class="button danger" href="{% url 'incidents:archive' incident.pk %}">Archive</a>
+        {% endif %}
         <a href="{% url 'incidents:list' %}">Back to list</a>
     </div>
 {% endblock %}
