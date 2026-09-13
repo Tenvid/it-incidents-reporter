@@ -22,5 +22,5 @@ con código organizado y fácil de explicar.
 | Comandos habituales (`make ...`)                                               | [`.claude/rules/commands.md`](.claude/rules/commands.md)       |
 | Formato de los mensajes de commit                                              | [`.claude/rules/commits.md`](.claude/rules/commits.md)         |
 | Dar por terminado un cambio de código (lint, tipos, tests)                     | skill `qa` (o agente `qa-runner`)                              |
-| Crear una app/módulo pendiente (`ml`, `networking`, `analisis`)                | skill `scaffold-app`                                           |
+| Crear una app/módulo pendiente (`ml`, `networking`)                            | skill `scaffold-app`                                           |
 | Auditar docstrings PEP 257 antes de generar docs con `pdoc`                    | agente `docstring-check`                                       |

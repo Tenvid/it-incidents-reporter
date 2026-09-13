@@ -32,7 +32,7 @@ add claude.md file`, `build: add project dependencies to pyproject`, etc.).
   - `chore`: mantenimiento que no modifica código fuente ni tests
   - `ci`: configuración de integración continua
 - Scope recomendado = app/módulo afectado: `incidents`, `user`, `ml`,
-  `networking`, `analisis`, `claude` (para configuración de Claude Code).
+  `networking`, `analysis`, `claude` (para configuración de Claude Code).
 - Un commit = un cambio lógico; evitar mezclar un refactor con una feature.
 - El cuerpo explica el *por qué*, no el *qué* (el diff ya muestra el qué).
 - Breaking changes: `!` tras el tipo/scope (p. ej. `feat(incidents)!: ...`)

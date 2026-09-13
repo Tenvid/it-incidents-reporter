@@ -36,7 +36,7 @@
 | `django-stubs`  | Tipos de Django para mypy                                                                          |
 | `pytest`        | Framework de testing                                                                               |
 | `pytest-django` | Integración de pytest con Django                                                                   |
-| `ipykernel`     | Ejecución de los notebooks (`analisis.ipynb`, `modelo.ipynb`)                                      |
+| `ipykernel`     | Ejecución de los notebooks (`analysis.ipynb`, `modelo.ipynb`)                                      |
 | `pdoc`          | Generación de documentación técnica a partir de los docstrings (equivalente a Doxygen para Python) |
 
 Gestión de entorno y dependencias con [`uv`](https://docs.astral.sh/uv/),
