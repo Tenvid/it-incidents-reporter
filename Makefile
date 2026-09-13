@@ -9,27 +9,27 @@ venv:
 
 # Ejecuta el servidor de desarrollo
 run:
-	uv run python manage.py runserver
+	uv run python src/manage.py runserver
 
 # Ejecuta makemigrations y migrate
 migrate:
-	uv run python manage.py makemigrations
-	uv run python manage.py migrate
+	uv run python src/manage.py makemigrations
+	uv run python src/manage.py migrate
 
-# Ejecuta ruff check y mypy sobre la ruta indicada (por defecto, todo el proyecto)
-# Uso: make qa PATH_ARG=incidencias
+# Ejecuta ruff check y mypy sobre la ruta indicada, relativa a src/ (por defecto, todo el proyecto)
+# Uso: make qa PATH_ARG=incidents
 qa:
-	uv run ruff check $(PATH_ARG)
-	uv run mypy $(PATH_ARG)
+	uv run ruff check src/$(PATH_ARG)
+	uv run mypy src/$(PATH_ARG)
 
-# Ejecuta los tests (carpeta tests/ en la raíz del proyecto)
+# Ejecuta los tests (carpeta src/tests/)
 test:
-	uv run pytest tests
+	uv run pytest src/tests
 
-# Ejecuta solo los tests unitarios (tests/unit)
+# Ejecuta solo los tests unitarios (src/tests/unit)
 test-unit:
-	uv run pytest tests/unit
+	uv run pytest src/tests/unit
 
-# Ejecuta solo los tests de integración (tests/integration)
+# Ejecuta solo los tests de integración (src/tests/integration)
 test-integration:
-	uv run pytest tests/integration
+	uv run pytest src/tests/integration

@@ -7,9 +7,10 @@ tools: Read, Bash, Grep, Glob
 You check code quality for the it-incidents-reporter Django project. You
 report problems — you do not fix them.
 
-1. Run `make qa PATH_ARG=<path given, default .>` and `make test` (the
-   environment is managed by `uv`, see the `Makefile`).
-2. If `tests/` doesn't exist yet, report that as the reason `make test`
+1. Run `make qa PATH_ARG=<path given, default .>` (resolved relative to
+   `src/`) and `make test` (the environment is managed by `uv`, see the
+   `Makefile`).
+2. If `src/tests/` doesn't exist yet, report that as the reason `make test`
    fails — don't describe it as a passing or skipped test suite.
 3. Summarize pass/fail per tool (ruff, mypy, pytest). For failures, list
    each as `file:line` + message, most important first (mypy type errors
