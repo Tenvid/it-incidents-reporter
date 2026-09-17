@@ -12,6 +12,7 @@ it-incidents-reporter/
 │   ├── incidents_reporter/    # proyecto Django (settings, urls, wsgi/asgi)
 │   ├── user/                  # app Django: usuario propio (auth por email + DNI)
 │   ├── incidents/              # app Django: modelos, vistas, forms, CRUD, dashboard
+│   │   └── management/commands/seed_incidents.py  # datos de ejemplo (make seed)
 │   ├── static/
 │   ├── templates/
 │   └── tests/                 # tests con pytest
@@ -20,8 +21,9 @@ it-incidents-reporter/
 ├── networking/
 │   └── comprobacion.py        # comprobación de conectividad (socket/requests)
 ├── ml/
-│   ├── modelo.ipynb            # entrenamiento del modelo de prioridad
-│   └── clasificador.py         # carga del modelo entrenado para usarlo desde Django
+│   ├── similarity.ipynb        # entrenamiento del modelo de similitud (TF-IDF)
+│   ├── similarity.joblib       # vectorizador entrenado, generado por el notebook
+│   └── similarity.py           # (pendiente) carga del modelo para inferencia desde Django
 ├── analysis/
 │   └── analysis.ipynb          # análisis exploratorio con Pandas
 ├── dashboard/
@@ -38,8 +40,10 @@ propósito; si en el futuro alguna se invoca desde una vista de
 añadiendo la raíz del repo al `sys.path` en `settings.py`), no de
 antemano.
 
-`analysis/` y `dashboard/` ya existen (`analysis.ipynb` y
-`dashboard.ipynb`, código y nombres en inglés); `ml/` y `networking/`
+`analysis/`, `dashboard/` y `ml/` ya existen (`analysis.ipynb`,
+`dashboard.ipynb` y `similarity.ipynb`, código y nombres en inglés); los
+tres notebooks leen `src/db.sqlite3` en solo lectura, sin Django, y se
+ejecutan desde la raíz del repositorio. `ml/similarity.py` y `networking/`
 siguen pendientes.
 
 ## Estado de implementación
@@ -56,8 +60,13 @@ siguen pendientes.
   y el dashboard en `dashboard/dashboard.ipynb`, ambos fuera de `src/`. El
   dashboard del notebook es un artefacto aparte: el dashboard con gráficos
   dentro de la app `incidents` (vista Django) sigue pendiente por separado.
-- **Pendiente**: `networking/`, `ml/`, `informe/`, `presentacion/`, y el
-  dashboard integrado en la app `incidents` — ninguno existe todavía en el
-  repositorio. El árbol de arriba describe la estructura objetivo del
+  El management command `seed_incidents` (`make seed`) genera incidencias de
+  ejemplo para los notebooks y la demo. Del módulo `ml/` existe el notebook
+  de entrenamiento `similarity.ipynb` y el vectorizador serializado
+  `similarity.joblib`.
+- **Pendiente**: `ml/similarity.py` (inferencia) y su integración en la app
+  `incidents` (sugerir incidencias similares al crear y en el detalle),
+  `networking/`, `informe/`, `presentacion/`, y el dashboard integrado en la
+  app `incidents`. El árbol de arriba describe la estructura objetivo del
   proyecto, no el estado actual del código. Al crear cada uno, seguir
   [`conventions.md`](conventions.md).

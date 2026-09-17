@@ -7,8 +7,9 @@
 - **Datos**: Pandas para el análisis de incidencias almacenadas.
 - **Visualización**: Matplotlib para los gráficos del dashboard y de los
   notebooks de análisis.
-- **Machine Learning**: scikit-learn para el modelo de clasificación de
-  prioridad.
+- **Machine Learning**: scikit-learn para el modelo de similitud de
+  incidencias (`TfidfVectorizer` + similitud coseno), serializado con
+  `joblib` (dependencia transitiva de scikit-learn).
 - **Networking**: `requests` para la comprobación HTTP; `socket` (stdlib)
   para la comprobación de puerto/conectividad.
 - **Base de datos**: SQLite (suficiente para el alcance del proyecto).
@@ -22,7 +23,7 @@
 | `django`         | Framework backend, ORM, autenticación, admin                         |
 | `django-jazzmin` | Tema del panel de administración de Django                           |
 | `pandas`         | Análisis de las incidencias almacenadas                              |
-| `scikit-learn`   | Modelo de clasificación automática de prioridad                      |
+| `scikit-learn`   | Modelo de similitud para detectar incidencias duplicadas             |
 | `matplotlib`     | Gráficos del dashboard (total, por prioridad, por estado, evolución) |
 | `requests`       | Comprobación HTTP de un equipo/servicio                              |
 | `python-dotenv`  | Carga de variables de entorno (`SECRET_KEY`, `DEBUG`, etc.)          |
@@ -36,7 +37,7 @@
 | `django-stubs`  | Tipos de Django para mypy                                                                          |
 | `pytest`        | Framework de testing                                                                               |
 | `pytest-django` | Integración de pytest con Django                                                                   |
-| `ipykernel`     | Ejecución de los notebooks (`analysis.ipynb`, `modelo.ipynb`)                                      |
+| `ipykernel`     | Ejecución de los notebooks (`analysis.ipynb`, `dashboard.ipynb`, `similarity.ipynb`)               |
 | `pdoc`          | Generación de documentación técnica a partir de los docstrings (equivalente a Doxygen para Python) |
 
 Gestión de entorno y dependencias con [`uv`](https://docs.astral.sh/uv/),

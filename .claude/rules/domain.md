@@ -9,7 +9,10 @@
 - Dashboard con estadísticas básicas y al menos 3 gráficos (total de
   incidencias, abiertas/cerradas, prioridad alta, por prioridad, por estado,
   evolución temporal).
-- Clasificación automática de prioridad mediante un modelo de ML sencillo.
+- Detección de incidencias similares (posibles duplicados) mediante un
+  modelo de ML sencillo: TF-IDF sobre título, descripción y equipo, y
+  similitud coseno contra las incidencias abiertas/en proceso. Se sugieren
+  al crear una incidencia y en su detalle; no requiere etiquetas.
 - Comprobación de conectividad de red (ping/socket a un puerto o petición
   HTTP a un equipo/servicio).
 

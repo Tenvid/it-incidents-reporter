@@ -3,9 +3,11 @@
 - Vistas de Django basadas en clases (salvo que por algún motivo sea necesario crear una vista basada en funciones.
   Estos motivos pueden ser por simplicidad de código o por limitaciones técnicas),
   manteniendo el CRUD de incidencias en la app `incidents`.
-- La lógica de ML (entrenamiento) vive en notebooks; el modelo entrenado se
-  serializa (p. ej. `joblib`) y se carga desde Django solo para inferencia,
-  sin reentrenar en cada petición.
+- La lógica de ML (entrenamiento) vive en notebooks (`ml/similarity.ipynb`);
+  el modelo entrenado se serializa con `joblib` (`ml/similarity.joblib`) y
+  se carga desde Django solo para inferencia, sin reentrenar en cada
+  petición. Solo se serializa el vectorizador: las incidencias candidatas se
+  vectorizan en cada consulta porque cambian constantemente.
 - La comprobación de red debe poder ejecutarse tanto integrada en la
   aplicación como script independiente (`python networking/comprobacion.py`).
 - Evitar sobreingeniería: no añadir DRF, autenticación por tokens, colas de
