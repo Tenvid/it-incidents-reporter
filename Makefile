@@ -1,4 +1,4 @@
-.PHONY: venv run migrate qa test test-unit test-integration
+.PHONY: venv run migrate seed qa test test-unit test-integration
 
 PATH_ARG ?= .
 
@@ -15,6 +15,11 @@ run:
 migrate:
 	uv run python src/manage.py makemigrations
 	uv run python src/manage.py migrate
+
+# Rellena la base de datos con incidencias de ejemplo (100 por defecto)
+# Uso: make seed ARGS="--count 150 --seed 42"
+seed:
+	uv run python src/manage.py seed_incidents $(ARGS)
 
 # Ejecuta ruff check y mypy sobre la ruta indicada, relativa a src/ (por defecto, todo el proyecto)
 # Uso: make qa PATH_ARG=incidents
