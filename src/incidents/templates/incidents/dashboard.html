@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Dashboard</h1>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="card kpi-card">
+            <span class="kpi-value">{{ total_incidents }}</span>
+            <span class="kpi-label">Total incidents</span>
+        </div>
+        <div class="card kpi-card">
+            <span class="kpi-value">{{ open_incidents }}</span>
+            <span class="kpi-label">Open incidents</span>
+        </div>
+        <div class="card kpi-card">
+            <span class="kpi-value">{{ closed_incidents }}</span>
+            <span class="kpi-label">Closed incidents</span>
+        </div>
+        <div class="card kpi-card">
+            <span class="kpi-value">{{ high_priority_incidents }}</span>
+            <span class="kpi-label">High priority</span>
+        </div>
+    </div>
+
+    <div class="chart-grid">
+        <div class="card">
+            <h2>Incidents by priority</h2>
+            <div id="priority-chart"></div>
+        </div>
+        <div class="card">
+            <h2>Incidents by status</h2>
+            <div id="status-chart"></div>
+        </div>
+        <div class="card">
+            <h2>Incidents by equipment</h2>
+            <div id="equipment-chart"></div>
+        </div>
+        <div class="card">
+            <h2>Incident evolution</h2>
+            <div class="chart-controls" id="evolution-controls">
+                <button type="button" data-granularity="day">Day</button>
+                <button type="button" data-granularity="week">Week</button>
+                <button type="button" class="active" data-granularity="month">Month</button>
+                <button type="button" data-granularity="year">Year</button>
+            </div>
+            <div id="evolution-chart"></div>
+        </div>
+    </div>
+
+    {{ priority_chart_data|json_script:"priority-chart-data" }}
+    {{ status_chart_data|json_script:"status-chart-data" }}
+    {{ equipment_chart_data|json_script:"equipment-chart-data" }}
+    {{ evolution_chart_data|json_script:"evolution-chart-data" }}
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/vendor/apexcharts.min.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

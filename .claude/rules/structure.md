@@ -14,6 +14,9 @@ it-incidents-reporter/
 │   ├── incidents/              # app Django: modelos, vistas, forms, CRUD, dashboard
 │   │   └── management/commands/seed_incidents.py  # datos de ejemplo (make seed)
 │   ├── static/
+│   │   └── js/
+│   │       ├── dashboard.js            # inicializa los gráficos de incidents:dashboard
+│   │       └── vendor/apexcharts.min.js  # ApexCharts vendorizado (versión fija, sin CDN)
 │   ├── templates/
 │   └── tests/                 # tests con pytest
 │       ├── unit/                # tests unitarios (sin BD real o BD trivial)
@@ -64,18 +67,24 @@ siguen pendientes.
 - **Ya implementado**: `src/manage.py`, `src/incidents_reporter/` (proyecto
   Django base), `src/user/` (modelo de usuario propio, registrado como
   `AUTH_USER_MODEL`) e `src/incidents/` (CRUD de incidencias, filtrado por
-  estado/prioridad, y la comprobación de operabilidad en
-  `incidents:operability`; el dashboard con gráficos queda pendiente dentro
-  de esta misma app). `src/tests/unit/` y `src/tests/integration/` están
+  estado/prioridad, la comprobación de operabilidad en
+  `incidents:operability`, y el dashboard con gráficos en
+  `incidents:dashboard`, solo para administradores: 4 KPIs y 4 gráficos
+  ApexCharts interactivos — por prioridad, por estado, por equipo y
+  evolución temporal con selector de granularidad día/semana/mes/año —
+  calculados con el ORM y pasados a la plantilla vía `json_script`).
+  `src/tests/unit/` y `src/tests/integration/` están
   configuradas en `pyproject.toml` y son ejecutables vía `make test-unit` /
   `make test-integration` / `make test`; ya tienen tests para `incidents`
-  (CRUD, duplicados, comprobación de operabilidad) y el comando `seed` — los
-  ficheros de test de cada app nueva se añaden con la skill `tests`.
-  También está implementado el análisis de datos en `analysis/analysis.ipynb`
-  y el dashboard en `dashboard/dashboard.ipynb`, ambos fuera de `src/`. El
-  dashboard del notebook es un artefacto aparte: el dashboard con gráficos
-  dentro de la app `incidents` (vista Django) sigue pendiente por separado.
-  El management command `seed_incidents` (`make seed`) genera incidencias de
+  (CRUD, duplicados, comprobación de operabilidad, dashboard) y el comando
+  `seed` — los ficheros de test de cada app nueva se añaden con la skill
+  `tests`. También está implementado el análisis de datos en
+  `analysis/analysis.ipynb` y el dashboard en `dashboard/dashboard.ipynb`,
+  ambos fuera de `src/`. El dashboard del notebook es un artefacto aparte,
+  independiente del dashboard integrado en `incidents`: ninguno de los dos
+  importa al otro, cada uno calcula sus propios datos (Pandas+SQL crudo el
+  notebook, el ORM de Django la vista). El management command
+  `seed_incidents` (`make seed`) genera incidencias de
   ejemplo para los notebooks y la demo. Del módulo `ml/` existe el notebook
   de entrenamiento `similarity.ipynb`, el vectorizador serializado
   `similarity.joblib` y `similarity.py` (inferencia), ya integrado en
@@ -86,7 +95,6 @@ siguen pendientes.
   (ver más arriba); `comprobacion.py` sigue pendiente.
 - **Pendiente**: la sugerencia de incidencias similares en la vista de
   detalle (la otra mitad de lo descrito en [`domain.md`](domain.md)),
-  `networking/comprobacion.py`, `informe/`, `presentacion/`, y el dashboard
-  integrado en la app `incidents`. El árbol de arriba describe la
-  estructura objetivo del proyecto, no el estado actual del código. Al
-  crear cada uno, seguir [`conventions.md`](conventions.md).
+  `networking/comprobacion.py`, `informe/` y `presentacion/`. El árbol de
+  arriba describe la estructura objetivo del proyecto, no el estado actual
+  del código. Al crear cada uno, seguir [`conventions.md`](conventions.md).

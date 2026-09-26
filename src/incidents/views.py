@@ -6,7 +6,8 @@ from typing import Any
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
-from django.db.models import QuerySet
+from django.db.models import Count, QuerySet
+from django.db.models.functions import TruncDay, TruncMonth, TruncWeek, TruncYear
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views import View
@@ -273,3 +274,115 @@ class IncidentUnarchiveView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
         self.object.is_archived = False
         self.object.save(update_fields=["is_archived"])
         return HttpResponseRedirect(success_url)
+
+
+class DashboardView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
+    """Admin-only dashboard with KPI counts and ApexCharts visualisations.
+
+    Mirrors, inside the app, the metrics already computed read-only by
+    ``analysis/analysis.ipynb`` and ``dashboard/dashboard.ipynb``; where a
+    metric appears in both notebooks it is represented here only once.
+    """
+
+    template_name = "incidents/dashboard.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        """Compute KPI counts and chart datasets for the dashboard template.
+
+        :param kwargs: Extra context passed by the parent implementation.
+        :return: The context dictionary rendered by the template.
+        """
+        context = super().get_context_data(**kwargs)
+        context["total_incidents"] = Incident.objects.count()
+        context["open_incidents"] = (
+            Incident.objects.filter(is_archived=False)
+            .exclude(status=Incident.Status.CLOSED)
+            .count()
+        )
+        context["closed_incidents"] = Incident.objects.filter(
+            status=Incident.Status.CLOSED
+        ).count()
+        context["high_priority_incidents"] = Incident.objects.filter(
+            priority=Incident.Priority.HIGH
+        ).count()
+        context["priority_chart_data"] = self._priority_chart_data()
+        context["status_chart_data"] = self._status_chart_data()
+        context["equipment_chart_data"] = self._equipment_chart_data()
+        context["evolution_chart_data"] = self._evolution_chart_data()
+        return context
+
+    def _priority_chart_data(self) -> dict[str, list[Any]]:
+        """Return incident counts per priority, ordered like ``Incident.Priority``.
+
+        :return: A dict with parallel ``labels`` and ``series`` lists.
+        """
+        counts = dict(
+            Incident.objects.values("priority")
+            .annotate(count=Count("id"))
+            .values_list("priority", "count")
+        )
+        return {
+            "labels": [label for _, label in Incident.Priority.choices],
+            "series": [counts.get(value, 0) for value, _ in Incident.Priority.choices],
+        }
+
+    def _status_chart_data(self) -> dict[str, list[Any]]:
+        """Return incident counts per status, ordered like ``Incident.Status``.
+
+        :return: A dict with parallel ``labels`` and ``series`` lists.
+        """
+        counts = dict(
+            Incident.objects.values("status")
+            .annotate(count=Count("id"))
+            .values_list("status", "count")
+        )
+        return {
+            "labels": [label for _, label in Incident.Status.choices],
+            "series": [counts.get(value, 0) for value, _ in Incident.Status.choices],
+        }
+
+    def _equipment_chart_data(self) -> dict[str, list[Any]]:
+        """Return incident counts per affected equipment, for the top 15 equipments.
+
+        :return: A dict with parallel ``labels`` and ``series`` lists, ordered
+            by descending incident count.
+        """
+        rows = (
+            Incident.objects.values("equipment")
+            .annotate(count=Count("id"))
+            .order_by("-count")[:15]
+        )
+        return {
+            "labels": [row["equipment"] for row in rows],
+            "series": [row["count"] for row in rows],
+        }
+
+    def _evolution_chart_data(self) -> dict[str, list[dict[str, Any]]]:
+        """Return incident counts created per time period, at four granularities.
+
+        :return: A dict mapping ``"day"``, ``"week"``, ``"month"`` and
+            ``"year"`` to a list of ``{"x": <ISO date>, "y": <count>}`` points,
+            ready to feed directly into an ApexCharts datetime series.
+        """
+        return {
+            "day": self._evolution_series(TruncDay),
+            "week": self._evolution_series(TruncWeek),
+            "month": self._evolution_series(TruncMonth),
+            "year": self._evolution_series(TruncYear),
+        }
+
+    def _evolution_series(self, trunc_func: type) -> list[dict[str, Any]]:
+        """Return incident counts per period, truncated with the given function.
+
+        :param trunc_func: A ``django.db.models.functions`` truncation class
+            (e.g. ``TruncMonth``) applied to the incident's ``date`` field.
+        :return: A list of ``{"x": <ISO date>, "y": <count>}`` points, ordered
+            chronologically.
+        """
+        rows = (
+            Incident.objects.annotate(period=trunc_func("date"))
+            .values("period")
+            .annotate(count=Count("id"))
+            .order_by("period")
+        )
+        return [{"x": row["period"].strftime("%Y-%m-%d"), "y": row["count"]} for row in rows]

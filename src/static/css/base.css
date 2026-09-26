@@ -172,3 +172,51 @@ dl.detail dt {
 .card h2 {
     margin-top: 0;
 }
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.kpi-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0;
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.kpi-label {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 0.75rem;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+}
+
+.chart-controls button {
+    background: var(--color-bg-alt);
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+}
+
+.chart-controls button.active {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+}
