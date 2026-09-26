@@ -4,7 +4,7 @@ import json
 from typing import Any
 
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
@@ -20,6 +20,7 @@ from django.views.generic import (
 )
 
 from incidents.forms import IncidentForm
+from incidents.mixins import StaffRequiredMixin
 from incidents.models import Incident
 from ml.similarity import find_similar
 
@@ -202,7 +203,7 @@ class IncidentUpdateView(HideArchivedMixin, LoginRequiredMixin, UpdateView):
     form_class = IncidentForm
 
 
-class IncidentArchiveView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class IncidentArchiveView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
     """Archive an incident instead of deleting it, after confirmation.
 
     This is a soft delete: the incident row is kept, marked as archived, so
@@ -217,13 +218,6 @@ class IncidentArchiveView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Incident
     context_object_name = "incident"
     template_name = "incidents/incident_confirm_archive.html"
-
-    def test_func(self) -> bool:
-        """Restrict this action to staff (administrator) users.
-
-        :return: ``True`` if the requesting user is staff.
-        """
-        return bool(self.request.user.is_staff)
 
     def get_success_url(self) -> str:
         """Return the incident's own detail page as the post-archive redirect target.
@@ -247,7 +241,7 @@ class IncidentArchiveView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-class IncidentUnarchiveView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class IncidentUnarchiveView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
     """Restore an archived incident, after confirmation, so regular users can see it again.
 
     Staff-only: archived incidents are hidden from the queryset used by the
@@ -258,13 +252,6 @@ class IncidentUnarchiveView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
     model = Incident
     context_object_name = "incident"
     template_name = "incidents/incident_confirm_unarchive.html"
-
-    def test_func(self) -> bool:
-        """Restrict this action to staff (administrator) users.
-
-        :return: ``True`` if the requesting user is staff.
-        """
-        return bool(self.request.user.is_staff)
 
     def get_success_url(self) -> str:
         """Return the incident's own detail page as the post-unarchive redirect target.
