@@ -35,7 +35,12 @@ ignore = ["RUF012"]
 
 [tool.mypy]
 plugins = ["mypy_django_plugin.main"]
-mypy_path = "src"
+mypy_path = "src:."
+
+[[tool.mypy.overrides]]
+# Neither ships type stubs or a py.typed marker.
+module = ["joblib", "sklearn.*"]
+ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "incidents_reporter.settings"

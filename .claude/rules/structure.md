@@ -23,7 +23,7 @@ it-incidents-reporter/
 ├── ml/
 │   ├── similarity.ipynb        # entrenamiento del modelo de similitud (TF-IDF)
 │   ├── similarity.joblib       # vectorizador entrenado, generado por el notebook
-│   └── similarity.py           # (pendiente) carga del modelo para inferencia desde Django
+│   └── similarity.py           # carga del vectorizador e inferencia, usado desde incidents
 ├── analysis/
 │   └── analysis.ipynb          # análisis exploratorio con Pandas
 ├── dashboard/
@@ -32,13 +32,18 @@ it-incidents-reporter/
 └── presentacion/               # presentación final (PPTX)
 ```
 
-Nótese que `ml/`, `networking/`, `analysis/` y `dashboard/` no están
-(todavía) integrados en el proyecto Django — no se importan desde `src/`.
-Son funcionalidades complementarias que hoy viven fuera de `src/` a
-propósito; si en el futuro alguna se invoca desde una vista de
-`incidents`, habrá que resolver entonces cómo hacerla importable (p. ej.
-añadiendo la raíz del repo al `sys.path` en `settings.py`), no de
-antemano.
+`networking/`, `analysis/` y `dashboard/` no están (todavía) integrados en
+el proyecto Django — no se importan desde `src/`. Son funcionalidades
+complementarias que hoy viven fuera de `src/` a propósito; si en el futuro
+alguna se invoca desde una vista de `incidents`, se resolverá su
+importabilidad entonces (no de antemano), siguiendo el mismo patrón ya
+aplicado a `ml/`.
+
+`ml/` es la primera excepción: `ml/similarity.py` sí se importa desde
+`src/incidents/views.py` (para sugerir incidencias similares al crear una),
+gracias a que `src/incidents_reporter/settings.py` añade la raíz del repo a
+`sys.path`. La dependencia va en un solo sentido — Django importa `ml/`,
+nunca al revés — así que `ml/` sigue sin importar Django ni su ORM.
 
 `analysis/`, `dashboard/` y `ml/` ya existen (`analysis.ipynb`,
 `dashboard.ipynb` y `similarity.ipynb`, código y nombres en inglés); los
@@ -62,10 +67,13 @@ siguen pendientes.
   dentro de la app `incidents` (vista Django) sigue pendiente por separado.
   El management command `seed_incidents` (`make seed`) genera incidencias de
   ejemplo para los notebooks y la demo. Del módulo `ml/` existe el notebook
-  de entrenamiento `similarity.ipynb` y el vectorizador serializado
-  `similarity.joblib`.
-- **Pendiente**: `ml/similarity.py` (inferencia) y su integración en la app
-  `incidents` (sugerir incidencias similares al crear y en el detalle),
+  de entrenamiento `similarity.ipynb`, el vectorizador serializado
+  `similarity.joblib` y `similarity.py` (inferencia), ya integrado en
+  `incidents`: un botón "Check dupes" en el formulario de creación envía el
+  título/descripción/equipo por AJAX a una vista que puntúa la incidencia
+  contra las abiertas/en proceso y muestra las coincidencias en un modal.
+- **Pendiente**: la sugerencia de incidencias similares en la vista de
+  detalle (la otra mitad de lo descrito en [`domain.md`](domain.md)),
   `networking/`, `informe/`, `presentacion/`, y el dashboard integrado en la
   app `incidents`. El árbol de arriba describe la estructura objetivo del
   proyecto, no el estado actual del código. Al crear cada uno, seguir

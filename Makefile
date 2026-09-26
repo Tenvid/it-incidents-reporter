@@ -22,9 +22,11 @@ seed:
 	uv run python src/manage.py seed_incidents $(ARGS)
 
 # Ejecuta ruff check y mypy sobre la ruta indicada, relativa a src/ (por defecto, todo el proyecto)
+# ml/ se incluye siempre en el ruff check: aunque vive fuera de src/, ml/similarity.py
+# es código de inferencia que importa la app incidents, no solo un notebook de apoyo.
 # Uso: make qa PATH_ARG=incidents
 qa:
-	uv run ruff check src/$(PATH_ARG)
+	uv run ruff check src/$(PATH_ARG) ml
 	uv run mypy src/$(PATH_ARG)
 
 # Ejecuta los tests (carpeta src/tests/)

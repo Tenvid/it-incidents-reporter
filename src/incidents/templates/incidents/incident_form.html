@@ -9,7 +9,10 @@
         {% csrf_token %}
         {{ form.as_p }}
         <div class="actions">
-            <button type="submit">Save</button>
+            {% if not object %}
+                <button type="button" id="check-dupes-btn" class="secondary">Check dupes</button>
+            {% endif %}
+            <button type="submit" {% if not object %}id="save-btn" disabled{% endif %}>Save</button>
             {% if object %}
                 <a href="{% url 'incidents:detail' object.pk %}">Cancel</a>
             {% else %}
@@ -17,4 +20,89 @@
             {% endif %}
         </div>
     </form>
+
+    {% if not object %}
+        <dialog id="dupes-modal">
+            <div id="dupes-modal-content"></div>
+            <button type="button" id="dupes-modal-close">Close</button>
+        </dialog>
+
+        <script>
+            // INFO: this only gates the Save button in the UI - it can be bypassed via devtools
+            // or a raw POST to incidents:create. Left unenforced server-side on purpose, to keep
+            // this simple for the project's scope.
+            (function () {
+                function getCookie(name) {
+                    const match = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+                    return match ? decodeURIComponent(match[2]) : null;
+                }
+
+                const titleField = document.getElementById("id_title");
+                const descriptionField = document.getElementById("id_description");
+                const equipmentField = document.getElementById("id_equipment");
+                const checkBtn = document.getElementById("check-dupes-btn");
+                const saveBtn = document.getElementById("save-btn");
+                const modal = document.getElementById("dupes-modal");
+                const modalContent = document.getElementById("dupes-modal-content");
+                const modalClose = document.getElementById("dupes-modal-close");
+
+                let checkedSignature = null;
+
+                function currentSignature() {
+                    return JSON.stringify([
+                        titleField.value.trim(),
+                        descriptionField.value.trim(),
+                        equipmentField.value.trim(),
+                    ]);
+                }
+
+                function refreshSaveState() {
+                    saveBtn.disabled = checkedSignature !== currentSignature();
+                }
+
+                [titleField, descriptionField, equipmentField].forEach((field) => {
+                    field.addEventListener("input", refreshSaveState);
+                });
+
+                function renderResults(duplicates) {
+                    if (duplicates.length === 0) {
+                        modalContent.innerHTML = "<p>No similar incidents found.</p>";
+                        return;
+                    }
+                    const items = duplicates
+                        .map(
+                            (d) =>
+                                `<li><a href="${d.url}">${d.title}</a> ` +
+                                `(${d.equipment}, ${d.status_display}) - ` +
+                                `${Math.round(d.score * 100)}% match</li>`
+                        )
+                        .join("");
+                    modalContent.innerHTML = `<ul>${items}</ul>`;
+                }
+
+                checkBtn.addEventListener("click", async () => {
+                    const requestSignature = currentSignature();
+                    const response = await fetch("{% url 'incidents:check_duplicates' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                        body: JSON.stringify({
+                            title: titleField.value,
+                            description: descriptionField.value,
+                            equipment: equipmentField.value,
+                        }),
+                    });
+                    const data = await response.json();
+                    checkedSignature = requestSignature;
+                    refreshSaveState();
+                    renderResults(data.duplicates);
+                    modal.showModal();
+                });
+
+                modalClose.addEventListener("click", () => modal.close());
+            })();
+        </script>
+    {% endif %}
 {% endblock %}

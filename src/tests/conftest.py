@@ -3,8 +3,10 @@
 from datetime import date
 
 import pytest
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from incidents.models import Incident
+from ml import similarity
 from user.models import CustomUser
 
 
@@ -104,3 +106,23 @@ def archived_incident(db: None, user: CustomUser) -> Incident:
         user=user,
         is_archived=True,
     )
+
+
+@pytest.fixture
+def fitted_vectorizer(monkeypatch: pytest.MonkeyPatch) -> TfidfVectorizer:
+    """Swap ``ml.similarity``'s loaded vectorizer for one fit on a small, fixed corpus.
+
+    Keeps duplicate-detection tests independent of any local
+    artifact.
+
+    :param monkeypatch: Pytest's monkeypatch fixture.
+    :return: The vectorizer now in effect for ``ml.similarity.find_similar``.
+    """
+    corpus = [
+        "printer paper jam display shows error printer room",
+        "server down network outage no connectivity server room",
+        "coffee machine leaking water kitchen floor",
+    ]
+    vectorizer = TfidfVectorizer().fit(corpus)
+    monkeypatch.setattr(similarity, "VECTORIZER", vectorizer)
+    return vectorizer

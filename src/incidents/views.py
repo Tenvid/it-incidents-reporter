@@ -1,11 +1,14 @@
 """Class-based views for the incidents CRUD."""
 
+import json
 from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import models
 from django.db.models import QuerySet
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.urls import reverse
+from django.views import View
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -16,6 +19,7 @@ from django.views.generic import (
 
 from incidents.forms import IncidentForm
 from incidents.models import Incident
+from ml.similarity import find_similar
 
 
 class HideArchivedMixin:
@@ -129,6 +133,41 @@ class IncidentCreateView(LoginRequiredMixin, CreateView):
         """
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+
+class IncidentDuplicateCheckView(LoginRequiredMixin, View):
+    """Score a candidate incident's text against open/in-progress incidents for duplicates.
+
+    Used by the "Check dupes" button on the incident creation form (AJAX). Only
+    gates the frontend's submit button; it is not a substitute for server-side
+    validation of the created incident.
+    """
+
+    def post(self, request: HttpRequest) -> JsonResponse:
+        """Return the open/in-progress incidents most similar to the posted text.
+
+        :param request: The AJAX POST request, with a JSON body containing
+            ``title``, ``description`` and ``equipment``.
+        :return: A JSON response with a ``"duplicates"`` list of matches, each
+            including its ``url``, ``status_display`` and similarity ``score``.
+        """
+        payload = json.loads(request.body)
+        candidates = list(
+            Incident.objects.filter(
+                status__in=[Incident.Status.OPEN, Incident.Status.IN_PROGRESS],
+                is_archived=False,
+            ).values("id", "title", "description", "equipment", "status")
+        )
+        matches = find_similar(
+            payload.get("title", ""),
+            payload.get("description", ""),
+            payload.get("equipment", ""),
+            candidates,
+        )
+        for match in matches:
+            match["url"] = reverse("incidents:detail", args=[match["id"]])
+            match["status_display"] = Incident.Status(match["status"]).label
+        return JsonResponse({"duplicates": matches})
 
 
 class IncidentUpdateView(HideArchivedMixin, LoginRequiredMixin, UpdateView):

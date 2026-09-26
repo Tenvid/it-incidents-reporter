@@ -21,7 +21,10 @@ datos SQLite en memoria (ver `DATABASES["default"]["TEST"]` en
 `src/incidents_reporter/settings.py`), nunca `db.sqlite3`.
 
 `PATH_ARG` en `make qa` es relativo a `src/` (p. ej. `make qa
-PATH_ARG=incidents` comprueba `src/incidents`).
+PATH_ARG=incidents` comprueba `src/incidents`). `ruff check` incluye siempre
+`ml/` además, ya que `ml/similarity.py` es código de inferencia importado por
+`incidents` (no solo un notebook de apoyo); `mypy` lo resuelve automáticamente
+al seguir el `import` desde `src/incidents`.
 
 `make seed` ejecuta el management command `seed_incidents` (opciones
 `--count`, `--seed`, `--days`); necesita al menos un usuario existente y no

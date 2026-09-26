@@ -9,6 +9,11 @@ app_name = "incidents"
 urlpatterns = [
     path("", views.IncidentListView.as_view(), name="list"),
     path("new/", views.IncidentCreateView.as_view(), name="create"),
+    path(
+        "check-duplicates/",
+        views.IncidentDuplicateCheckView.as_view(),
+        name="check_duplicates",
+    ),
     path("<int:pk>/", views.IncidentDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", views.IncidentUpdateView.as_view(), name="update"),
     path("<int:pk>/archive/", views.IncidentArchiveView.as_view(), name="archive"),

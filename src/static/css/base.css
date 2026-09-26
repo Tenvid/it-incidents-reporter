@@ -2,6 +2,7 @@
     --color-border: #d9dee3;
     --color-muted: #5f6b76;
     --color-accent: #2f6f4f;
+    --color-secondary: #2f6f8f;
     --color-danger: #a33a3a;
     --color-bg-alt: #f4f6f7;
 }
@@ -107,6 +108,15 @@ button, .button {
 
 .button.danger {
     background: var(--color-danger);
+}
+
+.secondary {
+    background: var(--color-secondary);
+}
+
+button:disabled {
+    background: var(--color-muted);
+    cursor: not-allowed;
 }
 
 .actions {
