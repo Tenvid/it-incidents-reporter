@@ -12,6 +12,13 @@
   aplicación como script independiente (`python networking/comprobacion.py`).
 - Evitar sobreingeniería: no añadir DRF, autenticación por tokens, colas de
   tareas ni microservicios — el alcance es una app Django monolítica.
+  **Única excepción**: el servicio de comprobación de operabilidad
+  (`networking/app.py` + `networking/check_api.py`), un microservicio Flask
+  aparte consultado directamente desde el navegador. Es deliberado: su
+  propósito es comprobar de extremo a extremo que la base de datos, la red
+  y un servicio externo funcionan, algo que pierde sentido si Django se
+  limita a llamarse a sí mismo. No sienta precedente para futuras
+  funcionalidades.
 - Todas las funciones y métodos públicos deben documentarse con docstrings
   siguiendo la convención oficial de Python ([PEP 257](https://peps.python.org/pep-0257/)),
   indicando propósito, parámetros y valor de retorno. Esta documentación es

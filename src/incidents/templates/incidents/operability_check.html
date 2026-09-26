@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Operability check{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Operability check</h1>
+    </div>
+
+    <p>
+        Fetches a random open incident straight from the operability-check
+        service, to confirm the database, the network and that service are
+        all working end to end.
+    </p>
+
+    <div class="actions">
+        <button type="button" id="fetch-btn">Fetch random incident</button>
+    </div>
+
+    <div id="operability-result"></div>
+
+    <script>
+        (function () {
+            const apiBaseUrl = "{{ api_base_url }}";
+            const incidentsBasePath = "{% url 'incidents:list' %}";
+
+            const fetchBtn = document.getElementById("fetch-btn");
+            const result = document.getElementById("operability-result");
+
+            function escapeHtml(text) {
+                const div = document.createElement("div");
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function renderMessage(text) {
+                result.innerHTML = `<p>${escapeHtml(text)}</p>`;
+            }
+
+            function renderIncident(incident) {
+                const detailUrl = incidentsBasePath + incident.id + "/";
+                result.innerHTML = `
+                    <div class="card">
+                        <h2>${escapeHtml(incident.title)}</h2>
+                        <dl class="detail">
+                            <dt>Description</dt>
+                            <dd>${escapeHtml(incident.description)}</dd>
+                            <dt>Equipment</dt>
+                            <dd>${escapeHtml(incident.equipment)}</dd>
+                            <dt>Priority</dt>
+                            <dd>${escapeHtml(incident.priority_display)}</dd>
+                            <dt>Status</dt>
+                            <dd>${escapeHtml(incident.status_display)}</dd>
+                            <dt>Date</dt>
+                            <dd>${escapeHtml(incident.date)}</dd>
+                        </dl>
+                        <div class="actions">
+                            <a class="button" href="${detailUrl}">View incident</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            fetchBtn.addEventListener("click", async () => {
+                renderMessage("Loading…");
+                let response;
+                try {
+                    response = await fetch(`${apiBaseUrl}/random-incident`);
+                } catch (error) {
+                    renderMessage("Operability service unavailable — is it running (make run-api)?");
+                    return;
+                }
+                if (response.status === 404) {
+                    renderMessage("No open incidents available right now.");
+                    return;
+                }
+                if (!response.ok) {
+                    renderMessage("Operability service returned an unexpected error.");
+                    return;
+                }
+                renderIncident(await response.json());
+            });
+        })();
+    </script>
+{% endblock %}

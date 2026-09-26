@@ -15,6 +15,12 @@
   al crear una incidencia y en su detalle; no requiere etiquetas.
 - Comprobación de conectividad de red (ping/socket a un puerto o petición
   HTTP a un equipo/servicio).
+- Comprobación de operabilidad del sistema de extremo a extremo: un botón
+  en `incidents:operability` pide, mediante una petición HTTP directa desde
+  el navegador, una incidencia aleatoria no archivada ni cerrada al
+  microservicio Flask de `networking/`, y la muestra con un enlace a su
+  detalle. Confirma que la base de datos, la red y ese servicio externo
+  funcionan juntos.
 
 ## Modelo de datos: Incidencia
 

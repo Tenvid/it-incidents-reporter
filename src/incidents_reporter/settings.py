@@ -10,8 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 import sys
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = BASE_DIR.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+# Loads REPO_ROOT/.env when present (see .env.example); manage.py runs with
+# the repo root as the working directory, so no explicit path is needed.
+load_dotenv()
 
 
 # Quick-start development settings - unsuitable for production
@@ -134,6 +141,13 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+
+# Operability-check service (networking/app.py)
+# Base URL the browser uses to reach it directly — see .claude/rules/conventions.md
+# for why this one feature talks to a separate Flask service instead of Django.
+
+INCIDENT_API_URL = os.environ.get("INCIDENT_API_URL", "http://localhost:5001")
 
 
 # Email

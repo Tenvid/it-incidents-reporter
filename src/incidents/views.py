@@ -3,6 +3,7 @@
 import json
 from typing import Any
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import models
 from django.db.models import QuerySet
@@ -14,6 +15,7 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
+    TemplateView,
     UpdateView,
 )
 
@@ -168,6 +170,29 @@ class IncidentDuplicateCheckView(LoginRequiredMixin, View):
             match["url"] = reverse("incidents:detail", args=[match["id"]])
             match["status_display"] = Incident.Status(match["status"]).label
         return JsonResponse({"duplicates": matches})
+
+
+class OperabilityCheckView(LoginRequiredMixin, TemplateView):
+    """Page that checks the system end to end via the operability-check service.
+
+    The page itself fetches a random incident client-side, straight from the
+    standalone Flask service in ``networking/`` (see
+    ``.claude/rules/conventions.md`` for why this one feature talks to a
+    separate service instead of Django), so this view only needs to pass
+    that service's base URL to the template.
+    """
+
+    template_name = "incidents/operability_check.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        """Add the operability-check service's base URL to the template context.
+
+        :param kwargs: Extra context passed by the parent implementation.
+        :return: The context dictionary rendered by the template.
+        """
+        context = super().get_context_data(**kwargs)
+        context["api_base_url"] = settings.INCIDENT_API_URL
+        return context
 
 
 class IncidentUpdateView(HideArchivedMixin, LoginRequiredMixin, UpdateView):

@@ -1,4 +1,4 @@
-.PHONY: venv run migrate seed qa test test-unit test-integration
+.PHONY: venv run run-api migrate seed qa test test-unit test-integration
 
 PATH_ARG ?= .
 
@@ -11,6 +11,10 @@ venv:
 run:
 	uv run python src/manage.py runserver
 
+# Ejecuta el servicio Flask de comprobación de operabilidad (incidencia aleatoria)
+run-api:
+	uv run python networking/app.py
+
 # Ejecuta makemigrations y migrate
 migrate:
 	uv run python src/manage.py makemigrations
@@ -22,12 +26,16 @@ seed:
 	uv run python src/manage.py seed_incidents $(ARGS)
 
 # Ejecuta ruff check y mypy sobre la ruta indicada, relativa a src/ (por defecto, todo el proyecto)
-# ml/ se incluye siempre en el ruff check: aunque vive fuera de src/, ml/similarity.py
-# es código de inferencia que importa la app incidents, no solo un notebook de apoyo.
+# ml/ y networking/ se incluyen siempre en el ruff check: aunque viven fuera de src/,
+# ml/similarity.py y networking/{check_api,app}.py son código real (inferencia y el
+# servicio de comprobación de operabilidad), no solo apoyo para notebooks.
+# mypy no sigue networking/ automáticamente (a diferencia de ml/, nada en src/ lo
+# importa), así que se comprueba con una llamada aparte.
 # Uso: make qa PATH_ARG=incidents
 qa:
-	uv run ruff check src/$(PATH_ARG) ml
+	uv run ruff check src/$(PATH_ARG) ml networking
 	uv run mypy src/$(PATH_ARG)
+	uv run mypy networking
 
 # Ejecuta los tests (carpeta src/tests/)
 test:

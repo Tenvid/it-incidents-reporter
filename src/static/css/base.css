@@ -160,3 +160,15 @@ dl.detail {
 dl.detail dt {
     color: var(--color-muted);
 }
+
+.card {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+    background: var(--color-bg-alt);
+}
+
+.card h2 {
+    margin-top: 0;
+}

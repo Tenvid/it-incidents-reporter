@@ -14,6 +14,7 @@ urlpatterns = [
         views.IncidentDuplicateCheckView.as_view(),
         name="check_duplicates",
     ),
+    path("operability/", views.OperabilityCheckView.as_view(), name="operability"),
     path("<int:pk>/", views.IncidentDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", views.IncidentUpdateView.as_view(), name="update"),
     path("<int:pk>/archive/", views.IncidentArchiveView.as_view(), name="archive"),

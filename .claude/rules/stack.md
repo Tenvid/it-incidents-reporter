@@ -12,6 +12,14 @@
   `joblib` (dependencia transitiva de scikit-learn).
 - **Networking**: `requests` para la comprobación HTTP; `socket` (stdlib)
   para la comprobación de puerto/conectividad.
+- **Comprobación de operabilidad**: Flask sirve un único endpoint
+  (`networking/app.py`, puerto configurable) que lee una incidencia
+  aleatoria de `db.sqlite3` con `sqlite3` (stdlib, sin ORM) y la devuelve
+  como JSON; la página Django la consulta con `fetch()` directamente desde
+  el navegador (no vía Django), por lo que el servicio añade su propia
+  cabecera CORS a mano (`after_request`, sin `flask-cors`) en vez de un
+  proxy Django. Es la única excepción documentada al alcance monolítico
+  (ver [`conventions.md`](conventions.md)).
 - **Base de datos**: SQLite (suficiente para el alcance del proyecto).
 
 ## Dependencias
@@ -22,6 +30,7 @@
 | ---------------- | -------------------------------------------------------------------- |
 | `django`         | Framework backend, ORM, autenticación, admin                         |
 | `django-jazzmin` | Tema del panel de administración de Django                           |
+| `flask`          | Microservicio de comprobación de operabilidad (`networking/app.py`)  |
 | `pandas`         | Análisis de las incidencias almacenadas                              |
 | `scikit-learn`   | Modelo de similitud para detectar incidencias duplicadas             |
 | `matplotlib`     | Gráficos del dashboard (total, por prioridad, por estado, evolución) |
