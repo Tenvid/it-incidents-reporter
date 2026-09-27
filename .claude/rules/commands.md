@@ -14,6 +14,7 @@ make qa PATH_ARG=incidents # Ejecuta ruff check y mypy sobre src/<ruta indicada>
 make test             # Ejecuta todos los tests (src/tests/)
 make test-unit        # Ejecuta solo los tests unitarios (src/tests/unit)
 make test-integration # Ejecuta solo los tests de integración (src/tests/integration)
+make docs              # Genera la documentación técnica con pdoc en docs/ (no versionado)
 ```
 
 La comprobación de operabilidad (`incidents:operability`) necesita **dos

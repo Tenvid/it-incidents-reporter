@@ -1,4 +1,4 @@
-.PHONY: venv run run-api run-all migrate seed qa test test-unit test-integration
+.PHONY: venv run run-api run-all migrate seed qa test test-unit test-integration docs
 
 PATH_ARG ?= .
 
@@ -53,3 +53,8 @@ test-unit:
 # Ejecuta solo los tests de integración (src/tests/integration)
 test-integration:
 	uv run pytest src/tests/integration
+
+# Genera la documentación técnica con pdoc a partir de los docstrings
+# (PEP 257) de incidents, user e incidents_reporter, en docs/
+docs:
+	cd src && DJANGO_SETTINGS_MODULE=incidents_reporter.settings uv run python -c "import django; django.setup(); import pdoc; from pathlib import Path; pdoc.pdoc('incidents', 'user', 'incidents_reporter', output_directory=Path('../docs'))"
