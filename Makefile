@@ -1,4 +1,4 @@
-.PHONY: venv run run-api migrate seed qa test test-unit test-integration
+.PHONY: venv run run-api run-all migrate seed qa test test-unit test-integration
 
 PATH_ARG ?= .
 
@@ -14,6 +14,11 @@ run:
 # Ejecuta el servicio Flask de comprobación de operabilidad (incidencia aleatoria)
 run-api:
 	uv run python networking/app.py
+
+# Ejecuta Django y el microservicio Flask a la vez (necesarios juntos para
+# incidents:operability); Ctrl+C detiene ambos procesos
+run-all:
+	$(MAKE) -j2 run run-api
 
 # Ejecuta makemigrations y migrate
 migrate:

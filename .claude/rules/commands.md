@@ -7,6 +7,7 @@ Los comandos habituales del proyecto están centralizados en el `Makefile`
 make venv            # Crea el entorno virtual e instala las dependencias con uv
 make run              # Ejecuta el servidor de desarrollo (src/manage.py runserver)
 make run-api           # Ejecuta el microservicio Flask de comprobación de operabilidad
+make run-all           # Ejecuta Django y Flask a la vez (Ctrl+C detiene ambos)
 make migrate          # Ejecuta makemigrations y migrate
 make seed             # Rellena la BD con incidencias de ejemplo (make seed ARGS="--count 150 --seed 42")
 make qa PATH_ARG=incidents # Ejecuta ruff check y mypy sobre src/<ruta indicada>
@@ -17,9 +18,11 @@ make test-integration # Ejecuta solo los tests de integración (src/tests/integr
 
 La comprobación de operabilidad (`incidents:operability`) necesita **dos
 procesos a la vez**: `make run` (Django, puerto 8000) y `make run-api`
-(Flask, puerto 5001 por defecto). Copia `.env.example` a `.env` en la raíz
-del repo y ajusta `API_HOST`/`API_PORT`/`ALLOWED_ORIGIN`/`INCIDENT_API_URL`
-si cambian los puertos o el hostname (p. ej. al desplegar con Docker).
+(Flask, puerto 5001 por defecto); `make run-all` lanza ambos en una sola
+terminal (Ctrl+C los detiene a los dos). Copia `.env.example` a `.env` en
+la raíz del repo y ajusta `API_HOST`/`API_PORT`/`ALLOWED_ORIGIN`/
+`INCIDENT_API_URL` si cambian los puertos o el hostname (p. ej. al
+desplegar con Docker).
 
 `src/tests/unit` y `src/tests/integration` son las dos únicas carpetas de
 tests del proyecto (ver [`structure.md`](structure.md)); qué va en cada una
