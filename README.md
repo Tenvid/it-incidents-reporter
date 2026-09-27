@@ -159,16 +159,11 @@ Los tests de integración usan una base de datos SQLite en memoria, nunca
 ## Documentación técnica
 
 La documentación se genera con `pdoc` a partir de los docstrings (PEP 257)
-de `src/incidents`, `src/user` e `src/incidents_reporter`:
+de `src/incidents`, `src/user` e `src/incidents_reporter`, en `docs/`
+(no versionado):
 
 ```bash
-cd src
-DJANGO_SETTINGS_MODULE=incidents_reporter.settings uv run python -c "
-import django; django.setup()
-import pdoc
-from pathlib import Path
-pdoc.pdoc('incidents', 'user', 'incidents_reporter', output_directory=Path('../docs'))
-"
+make docs
 ```
 
 ## Modelo de Machine Learning

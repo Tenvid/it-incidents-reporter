@@ -154,16 +154,11 @@ Integration tests use an in-memory SQLite database, never `db.sqlite3`.
 ## Technical documentation
 
 Documentation is generated with `pdoc` from the PEP 257 docstrings of
-`src/incidents`, `src/user` and `src/incidents_reporter`:
+`src/incidents`, `src/user` and `src/incidents_reporter`, into `docs/`
+(not version-controlled):
 
 ```bash
-cd src
-DJANGO_SETTINGS_MODULE=incidents_reporter.settings uv run python -c "
-import django; django.setup()
-import pdoc
-from pathlib import Path
-pdoc.pdoc('incidents', 'user', 'incidents_reporter', output_directory=Path('../docs'))
-"
+make docs
 ```
 
 ## Machine Learning model
