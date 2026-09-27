@@ -17,9 +17,13 @@
                         <a href="{% url 'incidents:dashboard' %}">Dashboard</a>
                     {% endif %}
                     <span>{{ user.email }}</span>
-                    <a href="/admin/logout/">Log out</a>
+                    <form method="post" action="{% url 'user:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="link-button">Log out</button>
+                    </form>
                 {% else %}
-                    <a href="/admin/login/?next={{ request.path }}">Log in</a>
+                    <a href="{% url 'user:login' %}?next={{ request.path }}">Log in</a>
+                    <a href="{% url 'user:register' %}">Register</a>
                 {% endif %}
             </div>
         </nav>

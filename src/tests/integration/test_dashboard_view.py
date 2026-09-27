@@ -10,7 +10,7 @@ from user.models import CustomUser
 def test_dashboard_view_redirects_anonymous_user_to_login(client: Client) -> None:
     response = client.get(reverse("incidents:dashboard"))
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 def test_dashboard_view_forbidden_for_non_staff_user(

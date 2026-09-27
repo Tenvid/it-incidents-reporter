@@ -21,7 +21,7 @@ def post_check(client: Client, title: str, description: str, equipment: str):
 def test_check_duplicates_view_redirects_anonymous_user_to_login(client: Client) -> None:
     response = post_check(client, "Printer jam", "printer paper jam", "printer room")
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 def test_check_duplicates_view_returns_matching_open_incident(

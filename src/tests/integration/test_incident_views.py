@@ -21,37 +21,37 @@ VALID_FORM_DATA = {
 def test_list_view_redirects_anonymous_user_to_login(client: Client) -> None:
     response = client.get(reverse("incidents:list"))
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 def test_detail_view_redirects_anonymous_user_to_login(client: Client, incident: Incident) -> None:
     response = client.get(reverse("incidents:detail", kwargs={"pk": incident.pk}))
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 def test_create_view_redirects_anonymous_user_to_login(client: Client) -> None:
     response = client.get(reverse("incidents:create"))
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 def test_update_view_redirects_anonymous_user_to_login(client: Client, incident: Incident) -> None:
     response = client.get(reverse("incidents:update", kwargs={"pk": incident.pk}))
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 def test_archive_view_redirects_anonymous_user_to_login(client: Client, incident: Incident) -> None:
     response = client.get(reverse("incidents:archive", kwargs={"pk": incident.pk}))
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 def test_unarchive_view_redirects_anonymous_user_to_login(client: Client, archived_incident: Incident) -> None:
     response = client.get(reverse("incidents:unarchive", kwargs={"pk": archived_incident.pk}))
     assert response.status_code == 302
-    assert response["Location"].startswith("/admin/login/")
+    assert response["Location"].startswith("/accounts/login/")
 
 
 # --- List view ---
