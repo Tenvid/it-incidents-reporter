@@ -6,7 +6,9 @@
 - La lógica de ML (entrenamiento) vive en notebooks (`ml/similarity.ipynb`);
   el modelo entrenado se serializa con `joblib` (`ml/similarity.joblib`) y
   se carga desde Django solo para inferencia, sin reentrenar en cada
-  petición. Solo se serializa el vectorizador: las incidencias candidatas se
+  petición. El modelo no se versiona y se carga de forma perezosa (en la
+  primera consulta, no al importar), para que `manage.py` funcione sin él.
+  Solo se serializa el vectorizador: las incidencias candidatas se
   vectorizan en cada consulta porque cambian constantemente.
 - La comprobación de red debe poder ejecutarse tanto integrada en la
   aplicación como script independiente (`python networking/comprobacion.py`).

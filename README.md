@@ -123,8 +123,14 @@ cp .env.example .env                 # ajusta host/puerto si hace falta
 make migrate                         # aplica las migraciones
 uv run python src/manage.py createsuperuser   # necesario para el dashboard admin
 
-make seed                            # opcional: incidencias de ejemplo (ARGS="--count 150 --seed 42")
+make seed                            # incidencias de ejemplo (ARGS="--count 150 --seed 42")
 ```
+
+Para usar el botón "Check dupes" hay que generar el modelo de similitud
+(`ml/similarity.joblib`, no versionado) ejecutando el notebook
+`ml/similarity.ipynb` desde la raíz del repositorio; para ello la base de datos
+necesita incidencias (`make seed`). Sin el modelo, el resto de la aplicación
+funciona con normalidad.
 
 ## Ejecución
 

@@ -18,7 +18,27 @@ from sklearn.metrics.pairwise import cosine_similarity
 MODEL_PATH = Path(__file__).resolve().parent / "similarity.joblib"
 MIN_SCORE = 0.3
 
-VECTORIZER = joblib.load(MODEL_PATH)
+VECTORIZER = None
+
+
+def load_vectorizer() -> Any:
+    """Return the trained vectorizer, loading it from disk on first use.
+
+    The model is loaded lazily, not on import, so that Django commands such as
+    ``migrate`` work before ``ml/similarity.ipynb`` has generated the file.
+
+    :return: The ``TfidfVectorizer`` serialized in ``similarity.joblib``.
+    :raises FileNotFoundError: If the model file has not been generated yet.
+    """
+    global VECTORIZER
+    if VECTORIZER is None:
+        try:
+            VECTORIZER = joblib.load(MODEL_PATH)
+        except FileNotFoundError as error:
+            raise FileNotFoundError(
+                f"{MODEL_PATH} not found: run ml/similarity.ipynb to train the model"
+            ) from error
+    return VECTORIZER
 
 
 def build_text(title: str, description: str, equipment: str) -> str:
@@ -62,8 +82,9 @@ def find_similar(
         build_text(candidate["title"], candidate["description"], candidate["equipment"])
         for candidate in candidates
     ]
-    candidate_matrix = VECTORIZER.transform(candidate_texts)
-    query_vector = VECTORIZER.transform([query_text])
+    vectorizer = load_vectorizer()
+    candidate_matrix = vectorizer.transform(candidate_texts)
+    query_vector = vectorizer.transform([query_text])
     scores = cosine_similarity(query_vector, candidate_matrix)[0]
 
     matches = [

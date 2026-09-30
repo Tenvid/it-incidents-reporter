@@ -120,8 +120,13 @@ cp .env.example .env                 # adjust host/port if needed
 make migrate                         # applies migrations
 uv run python src/manage.py createsuperuser   # needed for the admin dashboard
 
-make seed                            # optional: sample incidents (ARGS="--count 150 --seed 42")
+make seed                            # sample incidents (ARGS="--count 150 --seed 42")
 ```
+
+To use the "Check dupes" button, generate the similarity model
+(`ml/similarity.joblib`, not versioned) by running the `ml/similarity.ipynb`
+notebook from the repository root; the database needs incidents for that
+(`make seed`). Without the model, the rest of the application works normally.
 
 ## Running the project
 
